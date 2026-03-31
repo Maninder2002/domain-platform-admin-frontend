@@ -5,6 +5,7 @@ import domains from '../../pages/domains.vue'
 import extensions from '../../pages/extensions.vue'
 import settings from '../../pages/settings.vue'
 import pages from '../../pages/pagesEditor.vue'
+import profile from '../../pages/profile.vue'
 import notAuthorized from '../../pages/notAuthorized.vue'
 import notFound from '../../pages/notFound.vue'
 
@@ -46,6 +47,11 @@ const routes = [
   {
     path: '/pages',
     component: pages,
+    meta: { requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/profile',
+    component: profile,
     meta: { requiresAuth: true, requiresAdmin: true },
   },
   {
