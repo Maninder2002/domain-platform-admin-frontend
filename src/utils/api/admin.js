@@ -12,6 +12,13 @@ export const getDomains = (page = 1) => $api('api/admin/domains', {
   query: { page },
 })
 
+export const fixDomainsAndOrders = () => $api('api/admin/admin/fix-domains', {
+  method: 'POST',
+  onResponseError({ response }) {
+    throw response
+  },
+})
+
 export const getExtensions = () => $api('api/admin/extensions', {
   method: 'GET',
 })

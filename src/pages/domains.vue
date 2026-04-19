@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { getDomains } from '../utils/api/admin'
+import { fixDomainsAndOrders, getDomains } from '../utils/api/admin'
 
 const loading = ref(true)
+const fixing = ref(false)
 const error = ref('')
+const fixResult = ref('')
 const domains = ref([])
 const page = ref(1)
 const lastPage = ref(1)
@@ -23,14 +25,47 @@ const load = async nextPage => {
   }
 }
 
+const runFixDomainsAndOrders = async () => {
+  fixing.value = true
+  error.value = ''
+  fixResult.value = ''
+
+  try {
+    const res = await fixDomainsAndOrders()
+    const jobs = Number(res?.jobs_dispatched || 0)
+    fixResult.value = `${res?.message || 'Fix process started'} (${jobs} job${jobs === 1 ? '' : 's'} dispatched)`
+    await load(page.value)
+  } catch (e) {
+    error.value = e?._data?.message || 'Unable to start fix process.'
+  } finally {
+    fixing.value = false
+  }
+}
+
 onMounted(() => load(1))
 </script>
 
 <template>
   <section>
-    <h1 class="mb-4 text-2xl font-semibold">
-      Domains
-    </h1>
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <h1 class="text-2xl font-semibold">
+        Domains
+      </h1>
+      <button
+        :disabled="fixing || loading"
+        class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-slate-100 dark:text-slate-900"
+        @click="runFixDomainsAndOrders"
+      >
+        {{ fixing ? 'Fixing...' : 'Fix Domains & Orders' }}
+      </button>
+    </div>
+
+    <p
+      v-if="fixResult"
+      class="mb-4 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-600"
+    >
+      {{ fixResult }}
+    </p>
 
     <p
       v-if="error"
