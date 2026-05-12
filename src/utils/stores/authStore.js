@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 
-export const useAuthStore = defineStore('Auth', {
+const ADMIN_USER_STORAGE_KEY = 'adminUserData'
+
+export const useAuthStore = defineStore('AdminAuth', {
   state: () => ({
     user: null,
     loggedIN: false,
@@ -10,14 +12,17 @@ export const useAuthStore = defineStore('Auth', {
     setUser(user) {
       this.user = user
       this.loggedIN = true
-      localStorage.setItem('userData', JSON.stringify(user))
+      localStorage.setItem(ADMIN_USER_STORAGE_KEY, JSON.stringify(user))
     },
 
     logout() {
+      localStorage.removeItem(ADMIN_USER_STORAGE_KEY)
       localStorage.removeItem('userData')
       this.$reset()
     },
   },
 
-  persist: true,
+  persist: {
+    key: 'admin-auth-store',
+  },
 })

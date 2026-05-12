@@ -2,20 +2,36 @@ import { ofetch } from 'ofetch'
 import router from '../router'
 import { useAuthStore } from '../stores/authStore'
 
-const getCsrfToken = () =>
-  document.cookie
+/** Admin SPA lives under `/admin/`; `/` baseURL turns `api/...` into `/admin/api/...`. Same-host API uses `origin`. */
+const resolveApiBaseURL = () => {
+  const raw = import.meta.env.VITE_API_BASE_URL
+  if (typeof raw === 'string' && /^https?:\/\//i.test(raw.trim())) {
+    return raw.trim().replace(/\/+$/, '')
+  }
+  if (typeof window !== 'undefined') {
+    return window.location.origin
+  }
+
+  return ''
+}
+
+const getCsrfToken = () => {
+  const row = document.cookie
     .split('; ')
-    .find(row => row.startsWith('XSRF-TOKEN='))
-    ?.split('=')[1]
+    .find(r => r.startsWith('XSRF-TOKEN='))
+
+  return row?.slice('XSRF-TOKEN='.length)
+}
 
 const clearSession = () => {
+  localStorage.removeItem('adminUserData')
   localStorage.removeItem('userData')
   const auth = useAuthStore()
   auth.logout()
 }
 
 export const $api = ofetch.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: resolveApiBaseURL(),
   credentials: 'include',
 
   async onRequest({ options }) {
@@ -23,6 +39,7 @@ export const $api = ofetch.create({
       ...options.headers,
       Accept: 'application/json',
       'X-Requested-With': 'XMLHttpRequest',
+      'X-Panel': 'admin',
     }
 
     const csrfToken = getCsrfToken()

@@ -12,7 +12,7 @@ import notFound from '../../pages/notFound.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/dashboard',
+    redirect: { path: '/login' },
   },
   {
     path: '/login',

@@ -28,7 +28,6 @@ const initAuth = async () => {
       return
     }
   } catch {
-    // handled by shared API client
   }
 
   auth.logout()

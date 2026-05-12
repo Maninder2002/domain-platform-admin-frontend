@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import routes from './routes'
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/admin/'),
   routes,
   scrollBehavior() {
     return { top: 0 }
@@ -11,7 +11,9 @@ const router = createRouter({
 
 const getUser = () => {
   try {
-    const raw = localStorage.getItem('userData')
+    const raw =
+      localStorage.getItem('adminUserData') ??
+      localStorage.getItem('userData')
     if (!raw) return null
 
     return JSON.parse(raw)
